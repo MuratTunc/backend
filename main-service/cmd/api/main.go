@@ -18,8 +18,14 @@ func main() {
 	// Log startup message
 	log.Printf("Starting %s on port %s...", ServiceName, ServicePort)
 
-	// Initialize app configuration
-	app := Config{}
+	// Initialize the GORM DB connection
+	db, err := NewDBConnection()
+	if err != nil {
+		log.Fatalf("Could not connect to the database: %v", err)
+	}
+
+	// Create a Config instance
+	app := &Config{DB: db}
 
 	// Create and configure the HTTP server
 	srv := &http.Server{
@@ -28,7 +34,7 @@ func main() {
 	}
 
 	// Start the server
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
