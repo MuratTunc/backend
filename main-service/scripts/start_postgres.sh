@@ -24,7 +24,7 @@ docker run -d \
 
 # Wait for the database to be ready
 echo "Waiting for PostgreSQL to start..."
-sleep 10
+sleep 15
 
 # Create the table in the database
 echo "Creating the table 'tb_casestudy'..."
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS tb_casestudy (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255),
     description TEXT,
-    imageurl VARCHAR(255),
+    imageUrl VARCHAR(255),
     creationtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 "

@@ -35,7 +35,7 @@ func MakeSaveImageDataEndpoint(svc Service) func(ctx context.Context, request in
 		// Map the request to the models.ImageData struct
 		data := models.ImageData{
 			Title:        req.Title,
-			Text:         req.Description, // Map description to Text field
+			Description:  req.Description,
 			ImageURL:     req.ImageURL,
 			CreationTime: req.CreationTime,
 		}

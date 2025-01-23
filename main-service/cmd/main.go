@@ -12,17 +12,32 @@ import (
 	"main-service/cmd/models"
 	"main-service/cmd/service"
 	"main-service/cmd/transport"
+
+	"github.com/fatih/color" // Import the color package
+)
+
+// Define constants for the database connection and service port
+const (
+	DBHost             = "localhost"
+	DBUser             = "postgres"
+	DBPassword         = "4258"
+	DBName             = "postgres"
+	DBPort             = "5439"
+	SSlMode            = "disable"
+	BackEndServicePort = ":8080"
 )
 
 func main() {
+	// (DSN) for PostgreSQL connection
+	dsn := "host=" + DBHost + " user=" + DBUser + " password=" + DBPassword + " dbname=" + DBName + " port=" + DBPort + " sslmode=" + SSlMode
+
 	// Database connection setup
-	dsn := "host=localhost user=yourUser password=yourPassword dbname=yourDB port=5432 sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Failed to connect to the database: %v", err)
 	}
 
-	// Migrate schema (make sure your table is set up)
+	// Migrate schema
 	err = db.AutoMigrate(&models.ImageData{})
 	if err != nil {
 		log.Fatalf("Failed to migrate schema: %v", err)
@@ -48,9 +63,10 @@ func main() {
 	r.Handle("/api/v1/main-service/save-image-data", saveImageDataHandler).Methods("POST")
 
 	// Start the HTTP server
-	log.Println("Starting server on port 8080...")
-	err = http.ListenAndServe(":8080", r)
+	log.Printf("%sStarting server on port %s...", color.GreenString("INFO: "), BackEndServicePort)
+
+	err = http.ListenAndServe(BackEndServicePort, r)
 	if err != nil {
-		log.Fatalf("Server failed to start: %v", err)
+		log.Fatalf("%sServer failed to start: %v", color.RedString("ERROR: "), err)
 	}
 }

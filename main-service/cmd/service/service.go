@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"log"
 	"main-service/cmd/models"
 
+	"github.com/fatih/color" // Import color package for colored logs
 	"gorm.io/gorm"
 )
 
@@ -24,9 +26,19 @@ func NewService(db *gorm.DB) Service {
 
 // SaveImageData saves metadata (ImageData) into the database.
 func (s *ImageService) SaveImageData(ctx context.Context, data models.ImageData) error {
-	// Insert the ImageData into the database using GORM
-	if err := s.DB.WithContext(ctx).Create(&data).Error; err != nil {
+
+	// Insert the ImageData into the database
+	err := s.DB.WithContext(ctx).Create(&data).Error
+	if err != nil {
+		red := color.New(color.FgRed).SprintFunc()
+		log.Printf(red("Failed to save data to the database: %v"), err)
+
+		// Return the error for further handling
 		return err
 	}
-	return nil // Return nil to indicate success
+
+	green := color.New(color.FgGreen).SprintFunc()
+	log.Printf(green("Successfully saved data to the database: %+v"), data)
+
+	return nil // Success
 }

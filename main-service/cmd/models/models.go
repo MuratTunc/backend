@@ -4,7 +4,7 @@ package models
 type ImageData struct {
 	ID           uint   `gorm:"primaryKey"`   // Auto-incrementing ID field
 	Title        string `json:"title"`        // Title of the image or case study
-	Text         string `json:"text"`         // Description of the image or case study
+	Description  string `json:"description"`  // Description of the image
 	ImageURL     string `json:"imageUrl"`     // URL of the image
 	CreationTime string `json:"creationTime"` // Time when the image was created in FireBase Cloud
 }
