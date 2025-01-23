@@ -9,7 +9,7 @@ import (
 
 const (
 	// Service configurations
-	ServicePort = "8088"         // Port on which the service will run
+	ServicePort = "8080"         // Port on which the service will run
 	ServiceName = "Main-Service" // Name of the service
 
 )
