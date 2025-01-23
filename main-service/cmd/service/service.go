@@ -27,6 +27,8 @@ func NewService(db *gorm.DB) Service {
 // SaveImageData saves metadata (ImageData) into the database.
 func (s *ImageService) SaveImageData(ctx context.Context, data models.ImageData) error {
 
+	log.Printf("Received data: %+v", data) // Log the received data
+
 	// Insert the ImageData into the database
 	err := s.DB.WithContext(ctx).Create(&data).Error
 	if err != nil {

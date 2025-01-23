@@ -3,6 +3,7 @@ package transport
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"main-service/cmd/models"
@@ -13,7 +14,10 @@ import (
 
 // SaveImageDataRequest defines the incoming request structure.
 type SaveImageDataRequest struct {
-	ImageData models.ImageData `json:"imageData"` // Metadata
+	Title        string `json:"title"`
+	Description  string `json:"description"`
+	ImageURL     string `json:"imageUrl"`
+	CreationTime string `json:"creationTime"`
 }
 
 // SaveImageDataResponse defines the outgoing response structure.
@@ -27,8 +31,16 @@ func MakeSaveImageDataEndpoint(svc service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		req := request.(SaveImageDataRequest)
 
+		// Convert the request into a models.ImageData struct
+		imageData := models.ImageData{
+			Title:        req.Title,
+			Description:  req.Description,
+			ImageURL:     req.ImageURL,
+			CreationTime: req.CreationTime,
+		}
+
 		// Call the service method
-		err := svc.SaveImageData(ctx, req.ImageData)
+		err := svc.SaveImageData(ctx, imageData)
 		if err != nil {
 			return SaveImageDataResponse{Message: "", Err: err.Error()}, nil
 		}
@@ -40,11 +52,13 @@ func MakeSaveImageDataEndpoint(svc service.Service) endpoint.Endpoint {
 
 // DecodeSaveImageDataRequest decodes incoming JSON requests.
 func DecodeSaveImageDataRequest(_ context.Context, r *http.Request) (interface{}, error) {
-	var req SaveImageDataRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	var request SaveImageDataRequest
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		log.Printf("Failed to decode request: %v", err) // Log any errors that occur during decoding
 		return nil, err
 	}
-	return req, nil
+	log.Printf("Decoded request: %+v", request) // Log the request to see if it's correctly decoded
+	return request, nil
 }
 
 // EncodeResponse encodes responses to JSON format.
