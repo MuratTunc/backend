@@ -14,7 +14,7 @@ import (
 	"main-service/cmd/service"
 	"main-service/cmd/transport"
 
-	"github.com/fatih/color" // Import the color package
+	"github.com/fatih/color" // color package
 )
 
 // Define constants for the database connection and service port
@@ -28,24 +28,43 @@ const (
 	BackEndServicePort = ":8080"
 )
 
-func main() {
+func setupCORS(r *mux.Router) http.Handler {
+	// Enable CORS
+	return cors.New(cors.Options{
+		AllowedOrigins: []string{
+			"http://localhost:3000", // Allow requests from localhost our React frontend web-app
+		},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // Cache preflight response for 5 minutes
+	}).Handler(r)
+}
+
+func connectToDB() (*gorm.DB, error) {
 	// (DSN) for PostgreSQL connection
 	dsn := "host=" + DBHost + " user=" + DBUser + " password=" + DBPassword + " dbname=" + DBName + " port=" + DBPort + " sslmode=" + SSlMode
-
 	// Database connection setup
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
-		red := color.New(color.FgRed).SprintFunc()
-		log.Fatalf(red("Failed to connect to the database: %v"), err)
+		return nil, err
 	}
-	// Migrate schema
 	err = db.AutoMigrate(&models.ImageData{})
 	if err != nil {
-		log.Fatalf("Failed to migrate schema: %v", err)
+		return nil, err
 	}
-	// Initialize service (passing DB connection to the service layer)
-	svc := service.NewService(db)
+	return db, nil
+}
 
+func initializeService(db *gorm.DB) service.Service {
+	// Initialize service (passing DB connection to the service layer)
+	return service.NewService(db)
+}
+
+func setupRoutes(svc service.Service) *mux.Router {
+	// Set up Gorilla Mux router
+	r := mux.NewRouter()
 	// Create the endpoint for saving image data
 	saveImageDataEndpoint := transport.MakeSaveImageDataEndpoint(svc)
 
@@ -55,29 +74,36 @@ func main() {
 		transport.DecodeSaveImageDataRequest, // Request decoder
 		transport.EncodeResponse,             // Response encoder
 	)
-	// Set up Gorilla Mux router
-	r := mux.NewRouter()
 
 	// Define the route for saving image data
 	r.Handle("/api/v1/main-service/save-image-data", saveImageDataHandler).Methods("POST")
 
-	// Enable CORS
-	corsHandler := cors.New(cors.Options{
-		AllowedOrigins: []string{
-			"http://localhost:3000", // Allow requests from localhost (your React frontend)
-		},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true,
-		MaxAge:           300, // Cache preflight response for 5 minutes
-	}).Handler(r)
+	return r
+}
 
+func startHTTPServer(r *mux.Router) error {
+	// Call the setupCORS function to get the CORS handler
+	corsHandler := setupCORS(r)
 	// Start the HTTP server
 	log.Printf("%sStarting server on port %s...", color.GreenString("INFO: "), BackEndServicePort)
+	return http.ListenAndServe(BackEndServicePort, corsHandler)
+}
 
-	err = http.ListenAndServe(BackEndServicePort, corsHandler)
+func main() {
+	// Connect to the database
+	db, err := connectToDB()
 	if err != nil {
+		red := color.New(color.FgRed).SprintFunc()
+		log.Fatalf(red("Failed to connect to the database: %v"), err)
+	}
+	// Initialize service
+	svc := initializeService(db)
+
+	// Set up routes
+	r := setupRoutes(svc)
+
+	// Start the HTTP server
+	if err := startHTTPServer(r); err != nil {
 		log.Fatalf("%sServer failed to start: %v", color.RedString("ERROR: "), err)
 	}
 }

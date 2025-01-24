@@ -31,21 +31,18 @@ func MakeSaveImageDataEndpoint(svc Service) func(ctx context.Context, request in
 		if !ok {
 			return nil, ErrInvalidRequest
 		}
-
-		// Map the request to the models.ImageData struct
+		// Mapping to models.ImageData struct
 		data := models.ImageData{
 			Title:        req.Title,
 			Description:  req.Description,
 			ImageURL:     req.ImageURL,
 			CreationTime: req.CreationTime,
 		}
-
 		// Call the service layer to save the image metadata
 		err := svc.SaveImageData(ctx, data)
 		if err != nil {
 			return SaveImageDataResponse{Error: err.Error()}, nil
 		}
-
 		// Return a success message in the response
 		return SaveImageDataResponse{Message: "Image metadata saved successfully"}, nil
 	}

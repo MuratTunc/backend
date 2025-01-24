@@ -38,13 +38,11 @@ func MakeSaveImageDataEndpoint(svc service.Service) endpoint.Endpoint {
 			ImageURL:     req.ImageURL,
 			CreationTime: req.CreationTime,
 		}
-
 		// Call the service method
 		err := svc.SaveImageData(ctx, imageData)
 		if err != nil {
 			return SaveImageDataResponse{Message: "", Err: err.Error()}, nil
 		}
-
 		// If successful, return a success message
 		return SaveImageDataResponse{Message: "Image metadata saved successfully"}, nil
 	}
