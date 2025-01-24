@@ -1,5 +1,7 @@
 Step 1: Ensure PostgreSQL is Running
 sudo ./scripts/start_postgres.sh
+Before pulling the image and running the container, the script checks if a container with the same name exists. 
+If it does, it stops and removes the container and starts to make new database.
 
 
 Step 2: Make Sure Your Go Modules Are Installed
@@ -13,6 +15,7 @@ sudo ./scripts/free_port_8080.sh
 Step 4: Run Your Go Service
 go run cmd/main.go
 
-This will start your service on the specified port (8080 in this case), and you should see a log message indicating that the server is running, like:
+This will start your service on the specified port (8080 in this case), and you should see a log message 
+indicating that the server is running.
 
 

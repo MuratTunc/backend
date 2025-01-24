@@ -8,3 +8,8 @@ type ImageData struct {
 	ImageURL     string `json:"imageUrl"`     // URL of the image
 	CreationTime string `json:"creationTime"` // Time when the image was created in FireBase Cloud
 }
+
+// TableName overrides the default table name used by GORM
+func (ImageData) TableName() string {
+	return "tb_casestudy"
+}
