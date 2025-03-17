@@ -10,9 +10,9 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"main-service/cmd/models"
-	"main-service/cmd/service"
-	"main-service/cmd/transport"
+	"main-service/internal/models"
+	"main-service/internal/service"
+	"main-service/internal/transport"
 
 	"github.com/fatih/color" // color package
 )

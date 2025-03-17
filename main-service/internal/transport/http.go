@@ -6,8 +6,8 @@ import (
 	"log"
 	"net/http"
 
-	"main-service/cmd/models"
-	"main-service/cmd/service"
+	"main-service/internal/models"
+	"main-service/internal/service"
 
 	"github.com/go-kit/kit/endpoint"
 )

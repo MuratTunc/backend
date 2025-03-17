@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"log"
-	"main-service/cmd/models"
+	"main-service/internal/models"
 
 	"github.com/fatih/color" // Import color package for colored logs
 	"gorm.io/gorm"

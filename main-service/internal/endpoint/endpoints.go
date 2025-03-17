@@ -3,7 +3,8 @@ package service
 import (
 	"context"
 	"errors"
-	"main-service/cmd/models"
+	"main-service/internal/models"
+	"main-service/internal/service"
 )
 
 // Define the error for an invalid request
@@ -24,7 +25,7 @@ type SaveImageDataResponse struct {
 }
 
 // MakeSaveImageDataEndpoint creates the endpoint for saving image metadata.
-func MakeSaveImageDataEndpoint(svc Service) func(ctx context.Context, request interface{}) (interface{}, error) {
+func MakeSaveImageDataEndpoint(svc service.Service) func(ctx context.Context, request interface{}) (interface{}, error) {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		// Convert the incoming request to SaveImageDataRequest
 		req, ok := request.(SaveImageDataRequest)
