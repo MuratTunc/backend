@@ -54,6 +54,9 @@ func connectToDB() (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+	// ✅ Print success message in green color
+	log.Printf("%s Successfully connected to the database!", color.GreenString("INFO:"))
+
 	return db, nil
 }
 
